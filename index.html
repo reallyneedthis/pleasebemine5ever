@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>for you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/default.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="gallery-body">
+
+<!-- background layer (edit in style.css -> body, or drop an image at assets/background.jpg) -->
+<div class="bg-layer"></div>
+<div class="bg-vignette"></div>
+
+<!-- ===================== SCREEN 1: FLOWER DROP ===================== -->
+<section id="screen-flowers" class="screen" data-music="assets/audio/flowers.mp3">
+  <!-- EDIT ME — a few Snoopy stickers in the background while the
+       flowers fall. Swap the files in assets/decor/, or change
+       which corner each one sits in via the decor-* classes in
+       style.css. -->
+  <div class="flower-decor" aria-hidden="true">
+    <img src="assets/decor/snoopy-doghouse.png" class="flower-decor-img decor-bl" alt="">
+    <img src="assets/decor/snoopy-shark.png" class="flower-decor-img decor-tr" alt="">
+    <img src="assets/decor/snoopy-sunflower.png" class="flower-decor-img decor-br" alt="">
+  </div>
+  <div id="flower-field"></div>
+  <p class="flower-caption">for you...</p>
+  <button id="flowers-continue" class="continue-btn" type="button">continue</button>
+</section>
+
+<!-- ===================== SCREEN 2: LOVE NOTE ===================== -->
+<section id="screen-love" class="screen love-screen" data-music="assets/audio/love.mp3">
+  <div id="mainDiv">
+    <div id="content">
+      <div id="code">
+        <span class="comments">/**</span><br />
+        <span class="space"/><span class="comments">*HAPPY BIRTHDAY VARCHASVIIIII</span><br />
+        <span class="space"/><span class="comments">*/</span><br />
+        Hey chasvi<br />
+        congratulations you are eighteen now<br />
+        <span class="comments">//you are so amazing</span><br />
+        everything about you is so pretty;<br />
+        <span class="comments">// Your eyes Your inability to hide your smile Your laugh.</span><br />
+        i especially love everytime you talk bout your intrests;<br />
+        i love the way you love your hyper niche things like white musk mamaearth;<br />
+        YOU ARE SO GONNA CRACK CLAT;<br />
+        today is all bout you ;<br />
+        i hope you spend your day with joy and laughter;<br />
+        you mean so much to us ;<br />
+        <span class="comments">// And this is our best try in showing that</span><br />
+        here's a little gift for you,;<br />
+        <br>
+        <br>
+        we hope you like it<br />
+        U DA BEST;<br />
+        <br>
+      </div>
+      <div id="loveHeart">
+        <canvas id="garden"></canvas>
+        <div id="words">
+          <div id="messages">
+            HAPPY BIRTHDAY<br/>
+            <div id="elapseClock"></div>
+          </div>
+          <div id="loveu">
+            WE LOVE YOU SO MUCH<br/>
+            <div class="signature"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SCREEN 3: FIRST-PERSON GALLERY ===================== -->
+<section id="screen-gallery" class="screen gallery-screen">
+
+  <div id="gallery-start" class="gallery-start">
+    <p class="eyebrow">step inside</p>
+    <h2 class="gallery-start-title">a little gallery, just for you</h2>
+    <p class="gallery-start-sub">wasd or the arrow keys to walk, the mouse to look around.<br>look at a painting until the crosshair lights up, then click it to play.<br>there's something waiting for you at the end of the tunnel.</p>
+    <button id="gallery-enter-btn" class="continue-btn show">step inside</button>
+  </div>
+
+  <div id="gallery-3d" class="gallery-3d" data-music="assets/audio/gallery.mp3">
+      <audio id="gallery-music" data-music-audio preload="auto" autoplay loop></audio>
+    <canvas id="gallery-canvas"></canvas>
+    <div class="crosshair" aria-hidden="true">
+      <span class="crosshair-dot"></span>
+      <span class="crosshair-ring"></span>
+    </div>
+    <p id="gallery-hint" class="gallery-hint"></p>
+
+    <div id="gallery-resume" class="gallery-resume">
+      <p>click to keep walking</p>
+    </div>
+
+    <p id="gallery-progress" class="gallery-progress">0 / 0 paintings seen</p>
+
+    <button id="gallery-finish-btn" class="continue-btn gallery-finish-btn">leave the gallery →</button>
+
+    <div id="gallery-video-overlay" class="gallery-video-overlay">
+      <div class="gallery-video-card">
+        <p id="gallery-video-name" class="gallery-video-name"></p>
+        <video id="gallery-video" playsinline controls></video>
+        <button id="gallery-video-close" class="gallery-video-close">back to the gallery</button>
+      </div>
+    </div>
+
+    <!-- passcode gate, shown when you click the sign at the end of the tunnel -->
+    <div id="gallery-passcode-overlay" class="gallery-video-overlay">
+      <div class="gallery-video-card lock-card">
+        <p class="eyebrow">one more thing</p>
+        <h2 class="lock-title">what's the passcode?</h2>
+        <p class="lock-sub">you'll know it when you see it</p>
+        <form id="password-form">
+          <input id="password-input" type="text" autocomplete="off" placeholder="•••••" />
+          <button type="submit">unlock</button>
+        </form>
+        <p id="passcode-error" class="lock-error"></p>
+        <button id="passcode-back" class="gallery-video-close">back to the gallery</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="js/jquery.js"></script>
+<script src="js/garden.js"></script>
+<script src="js/functions.js"></script>
+<script src="js/script.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="js/gallery.js"></script>
+<script src="js/music.js"></script>
+<script type="text/javascript">
+  function initLoveHeart() {
+    if (window.__loveHeartInited) return;
+    window.__loveHeartInited = true;
+
+    var $window = $(window), gardenCtx, gardenCanvas, $garden, garden;
+    var clientWidth = $(window).width();
+    var clientHeight = $(window).height();
+
+    const loveHeartEl = $("#loveHeart");
+    if (!loveHeartEl.length) return;
+
+    $loveHeart = loveHeartEl;
+    const heartWidth = loveHeartEl.width();
+    const heartHeight = loveHeartEl.height();
+    if (!heartWidth || !heartHeight) return;
+
+    offsetX = heartWidth / 2;
+    offsetY = heartHeight / 2 - 55;
+    $garden = $("#garden");
+    gardenCanvas = $garden[0];
+    gardenCanvas.width = heartWidth;
+    gardenCanvas.height = heartHeight;
+    gardenCtx = gardenCanvas.getContext("2d");
+    gardenCtx.globalCompositeOperation = "lighter";
+    garden = new Garden(gardenCtx, gardenCanvas);
+
+    $("#content").css("width", $loveHeart.width() + $("#code").width());
+    $("#content").css("height", Math.max($loveHeart.height(), $("#code").height()));
+    $("#content").css("margin-top", "30px");
+    $("#content").css("margin-left", "20px");
+
+    if (!window.__loveLoopStarted) {
+      setInterval(function () {
+        if (garden) garden.render();
+      }, Garden.options.growSpeed);
+      window.__loveLoopStarted = true;
+    }
+
+    var together = new Date();
+    together.setFullYear(2008, 8, 16);
+    together.setHours(16);
+    together.setMinutes(30);
+    together.setSeconds(0);
+    together.setMilliseconds(0);
+
+    if (!document.createElement('canvas').getContext) {
+      var msg = document.createElement("div");
+      msg.id = "errorMsg";
+      msg.innerHTML = "Your browser doesn't support HTML5!<br/>Recommend use Chrome 14+/IE 9+/Firefox 7+/Safari 4+";
+      document.body.appendChild(msg);
+      $("#code").css("display", "none");
+      $("#copyright").css("position", "absolute");
+      $("#copyright").css("bottom", "10px");
+      document.execCommand("stop");
+    } else {
+      setTimeout(function () {
+        startHeartAnimation();
+      }, 5000);
+
+      timeElapse(together);
+      setInterval(function () {
+        timeElapse(together);
+      }, 500);
+
+      adjustCodePosition();
+      $("#code").css({ opacity: 0, visibility: 'hidden' });
+      setTimeout(function () {
+        if (!$("#code").data('typewriter-running')) {
+          $("#code").typewriter();
+        }
+      }, 150);
+    }
+  }
+
+  window.initLoveHeart = initLoveHeart;
+</script>
+</body>
+</html>

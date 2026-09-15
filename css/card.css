@@ -1,0 +1,127 @@
+/* ============================================================
+   BIRTHDAY CARD PAGE (card.html)
+   A click-to-open flip card, inspired by the classic
+   "tap to reveal" animated birthday card idea.
+   ============================================================ */
+
+.bday-card {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  perspective: 1400px;
+  width: min(420px, 86vw);
+  aspect-ratio: 3 / 4;
+}
+
+.bday-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.bday-card-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  border-radius: 16px;
+  backface-visibility: hidden;
+  border: 1px solid rgba(201,161,90,0.4);
+}
+
+.bday-card-front {
+  z-index: 2;
+  background: #fffdf8;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.4);
+  transform-origin: left center;
+  transition: transform 1s cubic-bezier(0.22, 0.75, 0.2, 1), box-shadow 1s ease;
+}
+
+.bday-card.is-open .bday-card-front {
+  transform: rotateY(-154deg);
+  box-shadow: 12px 18px 30px rgba(0,0,0,0.18);
+}
+
+.bday-card-icon {
+  font-size: 3.2rem;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35));
+  animation: bday-bob 2.4s ease-in-out infinite;
+}
+
+.bday-card-tap {
+  margin: 18px 0 0;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  color: var(--gold);
+}
+
+.bday-card-back {
+  background: #fffdf8;
+  text-align: center;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.card-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.35rem, 5vw, 1.8rem);
+  color: #5a1824;
+  margin: 0 0 16px;
+  flex-shrink: 0;
+}
+
+.card-message {
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overflow-wrap: anywhere;
+  color: #5a1824;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  margin: 0 0 16px;
+}
+
+.card-signoff {
+  color: #5a1824;
+  font-size: 1.3rem;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+@keyframes bday-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* -------------------- confetti burst on open -------------------- */
+.confetti-field {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  width: 8px;
+  height: 14px;
+  opacity: 0.9;
+  animation: confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall {
+  from { transform: translateY(0) rotate(0deg); opacity: 1; }
+  to   { transform: translateY(105vh) rotate(540deg); opacity: 0.9; }
+}

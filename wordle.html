@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>for you — one last thing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/default.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="gallery-body" data-music="assets/audio/wordle.mp3">
+
+<!-- Wordle background: the newspaper graphic, with the wordle box
+     aligned to the blank parchment panel on the right. -->
+<div class="wordle-bg-wrap" id="wordle-bg-wrap">
+  <img id="wordle-bg-img" class="wordle-bg-img" src="assets/wordle-bg.jpg" alt="">
+</div>
+
+<!-- ===================== WORDLE — its own page now ===================== -->
+<section id="screen-wordle" class="screen is-active">
+  <div class="wordle-wrap" id="wordle-wrap">
+    <p class="eyebrow">one word, five letters, plenty of feeling</p>
+    <h2 class="wordle-title">guess it</h2>
+
+    <div id="board" class="board"></div>
+
+    <p class="wordle-msg" id="wordle-msg" aria-live="polite"></p>
+
+    <div id="keyboard" class="keyboard"></div>
+
+    <!-- EDIT ME — shown once the word is guessed (or the guesses run out) -->
+    <button id="wordle-continue-btn" class="continue-btn">see what's next →</button>
+  </div>
+</section>
+
+<script src="js/wordle.js"></script>
+<script src="js/music.js"></script>
+</body>
+</html>

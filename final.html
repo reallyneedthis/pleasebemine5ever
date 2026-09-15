@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>for you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/default.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="gallery-body" data-music="assets/audio/folders.mp3">
+
+<!-- final background: your image, with the video box aligned to
+     the blank panel inside it (see js/final.js for the panel's
+     measured position) -->
+<div class="final-bg-wrap" id="final-bg-wrap">
+  <img id="final-bg-img" class="final-bg-img" src="assets/final-bg.jpg" alt="">
+</div>
+
+<section class="screen is-active">
+  <div class="final-wrap" id="final-wrap">
+    <div class="final-video-wrap" id="final-video-wrap">
+      <video class="final-video" id="final-video" playsinline loop>
+        <source src="assets/videos/my-video.mp4" type="video/mp4">
+      </video>
+
+      <!-- EDIT ME — change or delete this caption -->
+      <div class="final-poster" id="final-poster">
+        <p class="final-caption">happy birthday, chasvi 💛</p>
+        <p class="final-caption-sub">this is my gift for you</p>
+        <button class="final-play-btn" id="final-play-btn" type="button" aria-label="play video">
+          <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="js/final.js"></script>
+<script src="js/music.js"></script>
+</body>
+</html>

@@ -1,0 +1,817 @@
+/* ============================================================
+   PALETTE (edit these to change the whole mood in one place)
+   ============================================================ */
+:root {
+  --ink:        #2b1016;   /* deep wine, base background */
+  --ink-2:      #1a0a0e;   /* darker edge for vignette */
+  --blush:      #e8b4bc;   /* soft rose accent */
+  --gold:       #c9a15a;   /* warm gold accent */
+  --cream:      #f5ecdf;   /* main text on dark */
+  --cream-dim:  #cdb9ad;   /* secondary text */
+  --wrong:      #4a3b3d;
+  --present:    #b8923f;
+  --correct:    #6f8c5f;
+
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans:  'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+/* Shared background music control. */
+.music-player {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 1000;
+  width: 74px;
+  height: 74px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.3));
+}
+.music-disc {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(245, 236, 223, 0.45);
+  border-radius: 50%;
+  background: url("../assets/disc.png") center / cover no-repeat;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.music-player:hover .music-disc,
+.music-player:focus-visible .music-disc {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 4px rgba(232, 180, 188, 0.2);
+}
+.music-player.is-playing .music-disc {
+  animation: record-spin 4s linear infinite;
+}
+.music-label {
+  color: #f5ecdf;
+  font: 600 8px/1 var(--sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: rotate(-18deg);
+}
+@keyframes record-spin {
+  to { transform: rotate(360deg); }
+}
+@media (max-width: 600px) {
+  .music-player {
+    right: 14px;
+    bottom: 14px;
+    width: 62px;
+    height: 62px;
+  }
+}
+
+html, body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--sans);
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   BACKGROUND
+   Drop your own photo at assets/background.jpg and it will show
+   automatically. Otherwise this soft gradient is the fallback.
+   ============================================================ */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(232,180,188,0.12), transparent 55%),
+    radial-gradient(circle at 80% 75%, rgba(201,161,90,0.10), transparent 50%),
+    var(--ink);
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(232,180,188,0.12), transparent 55%),
+    radial-gradient(circle at 80% 75%, rgba(201,161,90,0.10), transparent 50%),
+    url('assets/background.jpg'), none;
+  background-size: cover;
+  background-position: center;
+}
+.bg-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 40%, var(--ink-2) 130%);
+}
+
+/* ============================================================
+   FINAL PAGE BACKGROUND (final.html)
+   Drop your image at assets/final-bg.jpg. It fills the entire
+   viewport edge-to-edge (cropping whatever spills past the
+   screen's own shape, rather than leaving letterboxed bars on
+   the sides). The video box aligns itself to the blank panel on
+   that image (see js/final.js for the panel's measurements),
+   recalculated on load/resize so it lines up at any screen size.
+   Missing file? Falls back to the normal centered layout.
+   ============================================================ */
+.final-bg-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--ink);
+}
+.final-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.final-wrap {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  animation: rise 1s ease both;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* once js/final.js has measured the background image, it adds this
+   class and moves the box to sit exactly inside the white starred
+   panel — no padding/frame here, so the video wrap below fills that
+   panel at its exact measured dimensions (1158x614). */
+.final-wrap.positioned {
+  position: fixed;
+  padding: 0;
+  overflow: hidden;
+}
+.final-video-wrap {
+  position: relative;
+  width: min(58vw, 700px);
+  aspect-ratio: 1158 / 614;
+  max-width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #000;
+}
+.final-wrap.positioned .final-video-wrap {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+.final-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+}
+/* the caption + play button sit on top of the video as a poster;
+   clicking play fades this away and starts playback, tapping the
+   playing video brings it back so it can be paused/replayed */
+.final-poster {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+  text-align: center;
+  background: rgba(20, 13, 8, 0.34);
+  transition: opacity 0.35s ease;
+  cursor: pointer;
+}
+.final-poster.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.final-caption {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.4rem, 3.6vw, 2.3rem);
+  color: #fff;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.6);
+  margin: 0;
+}
+.final-caption-sub {
+  font-family: var(--sans);
+  font-size: clamp(0.85rem, 1.8vw, 1.05rem);
+  color: #f5ecdf;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+.final-play-btn {
+  width: 62px;
+  height: 62px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.94);
+  color: #2b1610;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.final-play-btn svg { margin-left: 3px; }
+.final-play-btn:hover,
+.final-play-btn:focus-visible { transform: scale(1.07); background: #fff; }
+
+/* ============================================================
+   SCREEN MANAGEMENT
+   ============================================================ */
+.screen {
+  display: none;
+  min-height: 100vh;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
+  padding: 24px;
+}
+.screen.is-active { display: flex; }
+
+#screen-love {
+  display: block !important;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 0;
+}
+#screen-love #mainDiv {
+  margin-left: 0;
+}
+#screen-love #content {
+  margin-left: 20px !important;
+  margin-top: 30px !important;
+}
+
+.eyebrow {
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--cream-dim);
+  margin: 0 0 10px;
+}
+
+/* ============================================================
+   SCREEN 1 — PASSWORD LOCK
+   ============================================================ */
+.lock-card {
+  text-align: center;
+  max-width: 420px;
+  animation: rise 0.9s ease both;
+}
+.lock-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  margin: 0 0 8px;
+  color: var(--cream);
+}
+.lock-sub {
+  color: var(--cream-dim);
+  margin: 0 0 28px;
+  font-size: 0.95rem;
+}
+#password-form {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+#password-input {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(232,180,188,0.35);
+  color: var(--cream);
+  padding: 12px 16px;
+  border-radius: 999px;
+  font-size: 1rem;
+  width: 220px;
+  text-align: center;
+  letter-spacing: 0.15em;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+#password-input:focus { border-color: var(--gold); }
+#password-form button {
+  background: var(--blush);
+  color: var(--ink-2);
+  border: none;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+#password-form button:hover { background: var(--gold); transform: translateY(-1px); }
+.lock-error {
+  color: #e39aa4;
+  font-size: 0.85rem;
+  margin-top: 14px;
+  height: 1em;
+  opacity: 0;
+}
+.lock-error.show { opacity: 1; animation: shake 0.4s ease; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* ============================================================
+   SCREEN 2 — FLOWER DROP
+   Falling flowers use assets/flowers.png (one image, many copies
+   fall + rotate at random offsets). Swap the file to change look.
+   ============================================================ */
+#screen-flowers { overflow: hidden; }
+/* decorative Snoopy stickers, sitting behind the falling flowers
+   (this div comes before #flower-field in the HTML, so the flowers
+   naturally render in front of it) */
+.flower-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.flower-decor-img {
+  position: absolute;
+  width: 120px;
+  height: auto;
+  opacity: 0;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,0.35));
+  animation: rise 1s ease 0.2s both;
+}
+.decor-bl { left: 2%;  bottom: 3%; width: 130px; }
+.decor-tr { right: 3%; top: 5%;    width: 130px; }
+.decor-br { right: 4%; bottom: 4%; width: 110px; }
+@media (max-width: 560px) {
+  .flower-decor-img { width: 80px !important; }
+}
+#flower-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.falling-flower {
+  position: absolute;
+  top: -120px;
+  width: 64px;
+  height: auto;
+  opacity: 0.95;
+  animation-name: fall;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35));
+}
+@keyframes fall {
+  from { transform: translateY(0) rotate(0deg); }
+  to   { transform: translateY(115vh) rotate(340deg); }
+}
+.flower-caption {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  color: var(--cream);
+  opacity: 0;
+  animation: rise 1s ease 1.4s both;
+  z-index: 2;
+}
+
+/* ============================================================
+   SCREEN — FIRST-PERSON GALLERY
+   ============================================================ */
+.gallery-screen {
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+/* -- entry card, shown before the visitor walks in -- */
+.gallery-start {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  max-width: 460px;
+  animation: rise 0.9s ease both;
+}
+.gallery-start-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+  margin: 0 0 14px;
+  color: var(--cream);
+}
+.gallery-start-sub {
+  color: var(--cream-dim);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0 0 28px;
+}
+
+/* -- the 3d canvas + its HUD, hidden until "walk in" is pressed -- */
+.gallery-3d {
+  position: fixed;
+  inset: 0;
+  display: none;
+}
+.gallery-3d.is-active { display: block; }
+
+#gallery-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: none;
+}
+
+.crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  pointer-events: none;
+  z-index: 4;
+  transform: translate(-50%, -50%);
+  transition: left 0.08s ease-out, top 0.08s ease-out;
+}
+.crosshair-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: var(--cream);
+  opacity: 0.65;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+.crosshair-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--cream);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+}
+/* the "cursor thing" — crosshair lights up gold and expands when a
+   painting is within click range and dead center in view */
+.crosshair--active .crosshair-dot {
+  background: #f0c987;
+  opacity: 1;
+}
+.crosshair--active .crosshair-ring {
+  opacity: 1;
+  transform: scale(1);
+  border-color: #f0c987;
+}
+
+.gallery-hint {
+  position: absolute;
+  top: calc(50% + 22px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  margin: 0;
+  padding: 5px 14px;
+  background: rgba(26,10,14,0.6);
+  border: 1px solid rgba(240,201,135,0.35);
+  border-radius: 999px;
+  color: #f0c987;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 4;
+}
+.gallery-hint.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.gallery-resume {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26,10,14,0.55);
+  color: var(--cream);
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+.gallery-resume.show { display: flex; }
+
+.gallery-progress {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 8px 18px;
+  background: rgba(26,10,14,0.55);
+  border: 1px solid rgba(232,180,188,0.25);
+  border-radius: 999px;
+  color: var(--cream-dim);
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+}
+
+.gallery-finish-btn {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(26,10,14,0.65);
+}
+.gallery-finish-btn:not(.show) { display: none; }
+
+.gallery-video-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20,8,11,0.86);
+  z-index: 5;
+}
+.gallery-video-overlay.show { display: flex; }
+.gallery-video-card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: min(920px, 92vw);
+  text-align: center;
+  animation: rise 0.35s ease both;
+}
+.gallery-video-name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.4rem;
+  color: var(--cream);
+  margin: 0 0 12px;
+}
+.gallery-video-card video {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(920px, 92vw);
+  max-height: 74vh;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #000;
+  border: 1px solid rgba(232,180,188,0.3);
+}
+.gallery-video-close {
+  margin-top: 18px;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.gallery-video-close:hover { background: var(--gold); color: var(--ink-2); }
+
+/* ============================================================
+   SCREEN 3 — WORDLE
+   ============================================================ */
+
+/* the newspaper background image (wordle.html) — full viewport,
+   letterboxed so it's never cropped, which keeps the parchment
+   panel visible (and alignable) on any screen size */
+.wordle-bg-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+}
+.wordle-bg-img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  display: block;
+}
+/* fallback for narrow/tall screens where the parchment panel would
+   render too small to hold the puzzle — cover the screen instead
+   of trying to align to the panel, with a scrim so the normal
+   light text (used by the non-positioned .wordle-wrap) stays legible */
+.wordle-bg-wrap.cover-mode .wordle-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.wordle-bg-wrap.cover-mode::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 8, 11, 0.55);
+}
+
+.wordle-wrap {
+  text-align: center;
+  width: 100%;
+  max-width: 420px;
+  animation: rise 0.7s ease both;
+}
+/* once js/wordle.js has measured the background image, it adds this
+   class and switches the box to sit exactly inside the parchment
+   panel instead of the normal centered layout */
+.wordle-wrap.positioned {
+  position: fixed;
+  max-width: none;
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  overflow: auto;
+}
+.wordle-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(1.8rem, 4.5vw, 2.4rem);
+  margin: 0 0 20px;
+}
+.board {
+  display: grid;
+  grid-template-rows: repeat(6, 1fr);
+  gap: 6px;
+  margin: 0 auto 20px;
+  width: min(320px, 80vw);
+}
+.board-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.tile {
+  aspect-ratio: 1;
+  border: 2px solid rgba(232,180,188,0.35);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  color: var(--cream);
+  background: rgba(255,255,255,0.03);
+  transition: transform 0.25s ease;
+}
+.tile.filled { border-color: var(--cream-dim); }
+.tile.correct { background: var(--correct); border-color: var(--correct); }
+.tile.present { background: var(--present); border-color: var(--present); }
+.tile.wrong   { background: var(--wrong);   border-color: var(--wrong); }
+.tile.pop { transform: scale(1.08); }
+
+.wordle-msg {
+  min-height: 1.4em;
+  color: var(--blush);
+  font-size: 0.95rem;
+  margin: 0 0 16px;
+}
+
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 26px;
+}
+.keyboard-row { display: flex; gap: 5px; }
+.key {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: var(--cream);
+  padding: 10px 8px;
+  min-width: 30px;
+  border-radius: 6px;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.key.wide { min-width: 48px; font-size: 0.68rem; }
+.key.correct { background: var(--correct); }
+.key.present { background: var(--present); }
+.key.wrong   { background: var(--wrong); opacity: 0.6; }
+
+.continue-btn {
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  padding: 12px 26px;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s ease, transform 0.4s ease, background 0.2s ease, color 0.2s ease;
+}
+.continue-btn.show { opacity: 1; transform: translateY(0); }
+.continue-btn:not(:disabled):hover { background: var(--gold); color: var(--ink-2); }
+.continue-btn:disabled { cursor: default; }
+
+@media (max-width: 420px) {
+  .key { padding: 9px 6px; min-width: 24px; }
+}
+
+/* ------------------------------------------------------------
+   wordle-on-parchment: once positioned over the newspaper
+   background, the default light/cream palette (built for a dark
+   background) disappears against the light panel — darken text,
+   tiles, and keys here so it stays legible on parchment. Filled
+   tiles (correct/present/wrong) already have their own solid
+   color and keep their cream lettering.
+   ------------------------------------------------------------ */
+.wordle-wrap.positioned .eyebrow,
+.wordle-wrap.positioned .wordle-title {
+  color: #2b1610;
+  text-shadow: none;
+}
+.wordle-wrap.positioned .wordle-msg {
+  color: #6b2f2f;
+}
+.wordle-wrap.positioned .tile {
+  color: #2b1610;
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(43, 22, 16, 0.4);
+}
+.wordle-wrap.positioned .tile.filled {
+  border-color: rgba(43, 22, 16, 0.75);
+}
+/* these need to win over ".wordle-wrap.positioned .tile" above — same
+   specificity would otherwise let source order decide, which was
+   silently wiping out the green/yellow/gray fill on every guess */
+.wordle-wrap.positioned .tile.correct {
+  color: var(--cream);
+  background: var(--correct);
+  border-color: var(--correct);
+}
+.wordle-wrap.positioned .tile.present {
+  color: var(--cream);
+  background: var(--present);
+  border-color: var(--present);
+}
+.wordle-wrap.positioned .tile.wrong {
+  color: var(--cream);
+  background: var(--wrong);
+  border-color: var(--wrong);
+}
+.wordle-wrap.positioned .key {
+  background: rgba(43, 22, 16, 0.14);
+  color: #2b1610;
+}
+.wordle-wrap.positioned .key.correct {
+  color: var(--cream);
+  background: var(--correct);
+}
+.wordle-wrap.positioned .key.present {
+  color: var(--cream);
+  background: var(--present);
+}
+.wordle-wrap.positioned .key.wrong {
+  color: var(--cream);
+  background: var(--wrong);
+  opacity: 0.6;
+}
+.wordle-wrap.positioned .continue-btn {
+  border-color: #6b4f22;
+  color: #4a2f14;
+}
+.wordle-wrap.positioned .continue-btn:hover {
+  background: #6b4f22;
+  color: var(--cream);
+}
